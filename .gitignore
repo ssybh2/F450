@@ -1,0 +1,27 @@
+# ROS 2 / colcon build products
+/build/
+/install/
+/log/
+**/build/
+**/install/
+**/log/
+
+# Simulink caches and intermediate code-generation products
+**/slprj/
+*.slxc
+*_ert_rtw/
+*_ert_rtw.zip
+*.autosave
+*.asv
+
+# Generated helper can recursively remove a ROS 2 source directory; keep it local
+/src/simulink/build_ros2_model.sh
+
+# Local EtherCAT/SOEM sources are intentionally not published here
+/.gitmodules
+/src/EcatV2_Master/
+/src/soem_bringup/
+
+# Editor and operating-system noise
+*~
+.DS_Store
