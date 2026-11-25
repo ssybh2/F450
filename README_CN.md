@@ -20,6 +20,11 @@
 F450/
 ├── README.md
 ├── README_CN.md
+├── task2/
+│   ├── Init.m
+│   ├── Init_control.m
+│   ├── Postion_control.slx
+│   └── CAD/CAD/Geometry/
 └── src/
     └── simulink/
         ├── softdrone_pid.slx          # 主 Simulink 模型
@@ -268,9 +273,16 @@ open_system('homework13.slx')
 
 ## 4.2 下载 Task 2（位置控制仿真）
 
-Task 2 的完整文件应位于 `task2/` 下，包括 `Init.m`、`Init_control.m`、`Postion_control.slx`（保留原文件拼写），以及 `CAD/CAD/Geometry/` 下的几何依赖文件。模型元数据标明 R2023b，几何模块需要 Simscape Multibody。无需提交自动生成的 `slprj/` 缓存。
+[Task 2 位置控制模型](./task2/Postion_control.slx)使用 Simulink R2023b 保存。两个初始化脚本和 Simscape Multibody 使用的 CAD 几何文件都在 [task2 目录](./task2/)。
 
-已有本地仓库的实验室电脑可以直接执行以下命令，只从远端 `main` 导出 Task 2 到主目录中的新文件夹。不会切换分支、修改现有工作区、stash 本地修改或覆盖原有模型。如果仓库不在 `~/F450`，请调整路径。如果模型或 CAD 目录尚未上传，命令会停止。
+如果本地仓库位于 `~/F450`，要在原仓库中更新 `main`，可在终端执行以下命令。使用其他路径时请替换第一行中的目录。
+
+```bash
+cd ~/F450 && git switch main && git pull --ff-only origin main
+ls -lh task2/Postion_control.slx task2/Init.m task2/Init_control.m
+```
+
+如果本地有正在编辑的模型，也可以将远端的 `task2` 单独导出到新目录。最后一行会打印下载位置。
 
 ```bash
 (
@@ -286,7 +298,7 @@ Task 2 的完整文件应位于 `task2/` 下，包括 `Init.m`、`Init_control.m
 )
 ```
 
-完整文件上传后，在 MATLAB 中将当前文件夹切换到终端输出的 `task2` 路径，执行：
+在 MATLAB 中将当前文件夹切换到更新后的 `F450/task2` 或单独导出的 `task2` 目录，然后执行以下命令。
 
 ```matlab
 % 先将 MATLAB 当前文件夹切换到下载的 task2 目录。

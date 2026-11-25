@@ -20,6 +20,11 @@ The current generated controller was produced with **MATLAB/Simulink R2023b**, u
 F450/
 ├── README.md
 ├── README_CN.md
+├── task2/
+│   ├── Init.m
+│   ├── Init_control.m
+│   ├── Postion_control.slx
+│   └── CAD/CAD/Geometry/
 └── src/
     └── simulink/
         ├── softdrone_pid.slx          # Main Simulink model
@@ -268,9 +273,16 @@ Downloading the homework does not regenerate or deploy the ROS 2 controller. No 
 
 ## 4.2 Download Task 2 (position-control simulation)
 
-The intended Task 2 package under `task2/` contains `Init.m`, `Init_control.m`, `Postion_control.slx` (original spelling), and the CAD geometry dependencies under `CAD/CAD/Geometry/`. The SLX metadata identifies R2023b; Simscape Multibody is required for its geometry blocks. Do not commit generated `slprj/` caches.
+The [Task 2 position-control model](./task2/Postion_control.slx) was saved with Simulink R2023b. Its initialization scripts and the CAD geometry used by Simscape Multibody are in the [task2 directory](./task2/).
 
-For existing lab computers, the following command fetches remote `main` and exports only Task 2 to a new directory under your home folder. It does not switch branches, modify the existing working tree, stash local edits, or overwrite existing models. Adjust `~/F450` if necessary. The command stops if the model or CAD directory has not yet been published.
+To update an existing clone on `main`, run the following in a terminal. Adjust `~/F450` to your clone location.
+
+```bash
+cd ~/F450 && git switch main && git pull --ff-only origin main
+ls -lh task2/Postion_control.slx task2/Init.m task2/Init_control.m
+```
+
+If you have local model edits, you can also export just the remote `task2` directory to a separate folder. The last line prints its location.
 
 ```bash
 (
@@ -286,7 +298,7 @@ For existing lab computers, the following command fetches remote `main` and expo
 )
 ```
 
-Once the full package is available, set the MATLAB Current Folder to the printed `task2` path and run:
+Set the MATLAB Current Folder to the updated `F450/task2` or the exported `task2` folder, then run the following commands.
 
 ```matlab
 % Set Current Folder to the downloaded task2 directory first.
