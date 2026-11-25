@@ -4,6 +4,8 @@
 
 **Already cloned?** [Update the repository and download the homework model safely](#41-update-an-existing-clone-and-get-the-latest-homework-model).
 
+**Task 2:** [Download the position-control simulation separately](#42-download-task-2-position-control-simulation).
+
 This repository contains the Simulink controller and generated ROS 2 packages for an F450 quadrotor flight-control project.
 
 The current generated controller was produced with **MATLAB/Simulink R2023b**, uses the **ERT (`ert.tlc`)** target, and targets **AMD/x86-64 Linux**. The generated ROS 2 node is `softdrone_pid`.
@@ -261,6 +263,39 @@ open_system('homework13.slx')
 ```
 
 Downloading the homework does not regenerate or deploy the ROS 2 controller. No rebuild is needed just to obtain the SLX file.
+
+---
+
+## 4.2 Download Task 2 (position-control simulation)
+
+The intended Task 2 package under `task2/` contains `Init.m`, `Init_control.m`, `Postion_control.slx` (original spelling), and the CAD geometry dependencies under `CAD/CAD/Geometry/`. The SLX metadata identifies R2023b; Simscape Multibody is required for its geometry blocks. Do not commit generated `slprj/` caches.
+
+For existing lab computers, the following command fetches remote `main` and exports only Task 2 to a new directory under your home folder. It does not switch branches, modify the existing working tree, stash local edits, or overwrite existing models. Adjust `~/F450` if necessary. The command stops if the model or CAD directory has not yet been published.
+
+```bash
+(
+  set -e -o pipefail
+  cd ~/F450
+  git fetch origin main
+  git cat-file -e FETCH_HEAD:task2/Postion_control.slx
+  git cat-file -e FETCH_HEAD:task2/CAD/CAD/Geometry
+  dest=$(mktemp -d "$HOME/F450-task2-XXXXXX")
+  git archive FETCH_HEAD task2 | tar -x -C "$dest"
+  ls -lh "$dest/task2"
+  echo "Task 2: $dest/task2"
+)
+```
+
+Once the full package is available, set the MATLAB Current Folder to the printed `task2` path and run:
+
+```matlab
+% Set Current Folder to the downloaded task2 directory first.
+addpath(genpath(fullfile(pwd, 'CAD')));
+run('Init_control.m');
+open_system('Postion_control.slx');
+```
+
+`Init_control.m` calls `Init.m` automatically. No ROS 2 rebuild is needed for this simulation. The model has not been run as part of this repository update.
 
 ---
 

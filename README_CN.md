@@ -4,6 +4,8 @@
 
 **已经克隆仓库？** [安全同步远端并获取最新 Homework 模型](#41-已有本地仓库同步最新-homework-模型保留本地修改)。
 
+**Task 2：** [单独下载位置控制仿真](#42-下载-task-2位置控制仿真)。
+
 本仓库包含 F450 四旋翼飞行控制项目的 Simulink 控制器，以及由 Simulink 生成的 ROS 2 软件包。
 
 当前提交的控制器代码由 **MATLAB/Simulink R2023b** 生成，使用 **ERT (`ert.tlc`)** 目标，并面向 **AMD/x86-64 Linux** 平台。生成的 ROS 2 节点名称为 `softdrone_pid`。
@@ -261,6 +263,39 @@ open_system('homework13.slx')
 ```
 
 仅获取 Homework 模型不需要重新生成或编译 ROS 2 节点，也不会自动部署控制器。
+
+---
+
+## 4.2 下载 Task 2（位置控制仿真）
+
+Task 2 的完整文件应位于 `task2/` 下，包括 `Init.m`、`Init_control.m`、`Postion_control.slx`（保留原文件拼写），以及 `CAD/CAD/Geometry/` 下的几何依赖文件。模型元数据标明 R2023b，几何模块需要 Simscape Multibody。无需提交自动生成的 `slprj/` 缓存。
+
+已有本地仓库的实验室电脑可以直接执行以下命令，只从远端 `main` 导出 Task 2 到主目录中的新文件夹。不会切换分支、修改现有工作区、stash 本地修改或覆盖原有模型。如果仓库不在 `~/F450`，请调整路径。如果模型或 CAD 目录尚未上传，命令会停止。
+
+```bash
+(
+  set -e -o pipefail
+  cd ~/F450
+  git fetch origin main
+  git cat-file -e FETCH_HEAD:task2/Postion_control.slx
+  git cat-file -e FETCH_HEAD:task2/CAD/CAD/Geometry
+  dest=$(mktemp -d "$HOME/F450-task2-XXXXXX")
+  git archive FETCH_HEAD task2 | tar -x -C "$dest"
+  ls -lh "$dest/task2"
+  echo "Task 2: $dest/task2"
+)
+```
+
+完整文件上传后，在 MATLAB 中将当前文件夹切换到终端输出的 `task2` 路径，执行：
+
+```matlab
+% 先将 MATLAB 当前文件夹切换到下载的 task2 目录。
+addpath(genpath(fullfile(pwd, 'CAD')));
+run('Init_control.m');
+open_system('Postion_control.slx');
+```
+
+`Init_control.m` 会自动调用 `Init.m`。仅运行此仿真无需重新编译 ROS 2 节点。本次仓库更新未实际运行模型。
 
 ---
 
