@@ -2,6 +2,8 @@
 
 [中文说明](./README_CN.md)
 
+**Already cloned?** [Update the repository and download the homework model safely](#41-update-an-existing-clone-and-get-the-latest-homework-model).
+
 This repository contains the Simulink controller and generated ROS 2 packages for an F450 quadrotor flight-control project.
 
 The current generated controller was produced with **MATLAB/Simulink R2023b**, uses the **ERT (`ert.tlc`)** target, and targets **AMD/x86-64 Linux**. The generated ROS 2 node is `softdrone_pid`.
@@ -19,6 +21,7 @@ F450/
 └── src/
     └── simulink/
         ├── softdrone_pid.slx          # Main Simulink model
+        ├── homework13.slx             # Homework Simulink model
         ├── Init_control450.m          # Controller parameters / initialization
         ├── +bus_conv_fcns/            # Generated ROS 2 bus conversion helpers
         └── src/
@@ -213,6 +216,54 @@ Before rebuilding, verify that the ROS 2 topic names, EtherCAT serial number, PW
 
 ---
 
+## 4.1 Update an existing clone and get the latest homework model
+
+The homework model is [`homework13.slx`](./src/simulink/homework13.slx), alongside the main controller `softdrone_pid.slx`.
+
+**Recommended for existing lab computers (including locally edited models):** save your work and close Simulink first. In Ubuntu, run the following in an existing clone on the `main` branch. Adjust `~/F450` if necessary.
+
+```bash
+cd ~/F450 && \
+  test "$(git branch --show-current)" = main && \
+  git status -sb && \
+  git stash push -u -m "F450 local backup before homework update" && \
+  git pull --ff-only origin main && \
+  git status -sb && \
+  ls -lh src/simulink/homework13.slx src/simulink/softdrone_pid.slx
+```
+
+This backs up tracked changes (including edited SLX models) and untracked, non-ignored files in a local Git stash, then pulls the latest remote `main` without creating a merge commit. If there are no local changes, no new stash is created. Ignored files are not included; back up any important ignored files separately. Nothing is pushed to GitHub.
+
+To inspect saved local work:
+
+```bash
+git stash list
+git rev-list --left-right --count HEAD...origin/main
+```
+
+The two counts are local-only and remote-only commits; `0 0` means the commits match. Do not automatically pop the stash: SLX files are binary and overlapping edits may conflict. If needed, restore the specific saved work later with `git stash apply 'stash@{N}'` (replace N with the correct index from the list); the stash is retained. Stop and inspect any conflicts.
+
+**Alternative: keep the current local models exactly as they are.** If local edits must remain active, or local commits have diverged and fast-forward fails, use a separate clean checkout of remote `main` instead:
+
+```bash
+cd ~/F450 && \
+  git fetch origin && \
+  git worktree add --detach "$HOME/F450-homework-$(date +%Y%m%d-%H%M%S)" origin/main
+```
+
+This creates a new timestamped directory under your home directory without overwriting the original working tree or changing its branch. If you already stashed changes in the first workflow, they remain in the stash. Do not use `git reset --hard` or `git clean -fd` to resolve update errors.
+
+Open the homework model from the updated repository (or the new checkout), in its `src/simulink` directory:
+
+```matlab
+run('Init_control450.m')
+open_system('homework13.slx')
+```
+
+Downloading the homework does not regenerate or deploy the ROS 2 controller. No rebuild is needed just to obtain the SLX file.
+
+---
+
 # 5. Fastest deployment: build the already generated ROS 2 node
 
 This is the quickest path if you only want to deploy the controller that is already committed to the repository. You do **not** need to regenerate C++ from Simulink first.
@@ -401,9 +452,10 @@ After successful generation, use the generated ROS 2 package as the source for y
 
 # 7. Update and rebuild after changing the repository
 
+First complete the safe synchronization in [section 4.1](#41-update-an-existing-clone-and-get-the-latest-homework-model) in the original clone if you intend to deploy from it. Only run the following if you actually need to rebuild the ROS 2 controller; it replaces the copied workspace packages, so back up any local workspace changes first.
+
 ```bash
 cd ~/F450
-git pull
 
 rm -rf ~/f450_ws/src/custom_msgs ~/f450_ws/src/softdrone_pid
 cp -r src/simulink/src/custom_msgs ~/f450_ws/src/
