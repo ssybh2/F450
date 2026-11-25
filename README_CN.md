@@ -2,6 +2,8 @@
 
 [English](./README.md)
 
+**已经克隆仓库？** [安全同步远端并获取最新 Homework 模型](#41-已有本地仓库同步最新-homework-模型保留本地修改)。
+
 本仓库包含 F450 四旋翼飞行控制项目的 Simulink 控制器，以及由 Simulink 生成的 ROS 2 软件包。
 
 当前提交的控制器代码由 **MATLAB/Simulink R2023b** 生成，使用 **ERT (`ert.tlc`)** 目标，并面向 **AMD/x86-64 Linux** 平台。生成的 ROS 2 节点名称为 `softdrone_pid`。
@@ -19,6 +21,7 @@ F450/
 └── src/
     └── simulink/
         ├── softdrone_pid.slx          # 主 Simulink 模型
+        ├── homework13.slx             # Homework 作业模型
         ├── Init_control450.m          # 控制器参数 / 初始化脚本
         ├── +bus_conv_fcns/            # 自动生成的 ROS 2 Bus 转换函数
         └── src/
@@ -213,6 +216,54 @@ open_system('softdrone_pid.slx')
 
 ---
 
+## 4.1 已有本地仓库：同步最新 Homework 模型（保留本地修改）
+
+新上传的作业模型是 [`homework13.slx`](./src/simulink/homework13.slx)，与主控制器 `softdrone_pid.slx` 位于同一目录。
+
+**推荐用于已经克隆过仓库的实验室电脑，包括本地 Simulink 模型已经修改过的设备。** 请先保存并关闭 Simulink，在 Ubuntu 终端执行以下命令（要求当前分支为 `main`；若仓库不在 `~/F450`，请替换路径）。
+
+```bash
+cd ~/F450 && \
+  test "$(git branch --show-current)" = main && \
+  git status -sb && \
+  git stash push -u -m "F450 local backup before homework update" && \
+  git pull --ff-only origin main && \
+  git status -sb && \
+  ls -lh src/simulink/homework13.slx src/simulink/softdrone_pid.slx
+```
+
+上述命令先将已跟踪文件的修改（包括 SLX 模型）以及未跟踪且未被忽略的文件备份到本地 Git stash，再以 fast-forward-only 方式拉取远端 `main`，不产生合并提交。如果本地没有修改，不会创建新的 stash。Git 忽略的文件不包含在备份中，重要的忽略文件需要另行备份。整个过程不会向 GitHub 推送任何修改。
+
+检查备份和同步状态：
+
+```bash
+git stash list
+git rev-list --left-right --count HEAD...origin/main
+```
+
+第二条命令分别显示本地独有、远端独有的提交数，`0 0` 表示提交一致。不要直接执行 `git stash pop`，因为 SLX 是二进制文件，双方同时修改时可能产生冲突。如果需要恢复之前的修改，请从列表中找到对应的备份，再执行 `git stash apply 'stash@{N}'`（将 N 替换为正确编号）；备份仍会保留。如遇冲突，请先检查，不要继续覆盖文件。
+
+**备选方案：完全保留当前本地模型。** 如果希望本地修改继续留在原目录使用，或本地提交与远端分叉、无法快进更新，可以单独创建一份远端 `main` 的干净工作目录：
+
+```bash
+cd ~/F450 && \
+  git fetch origin && \
+  git worktree add --detach "$HOME/F450-homework-$(date +%Y%m%d-%H%M%S)" origin/main
+```
+
+该命令会在用户主目录下创建带时间戳的新目录，不覆盖原工作目录，也不改变原分支。若已经执行了前面的 stash，修改仍在 stash 中。不要使用 `git reset --hard` 或 `git clean -fd` 强行解决更新问题。
+
+在更新后的仓库（或新工作目录）的 `src/simulink` 下打开 MATLAB，执行：
+
+```matlab
+run('Init_control450.m')
+open_system('homework13.slx')
+```
+
+仅获取 Homework 模型不需要重新生成或编译 ROS 2 节点，也不会自动部署控制器。
+
+---
+
 # 5. 最快部署方式：直接编译仓库中已经生成好的 ROS 2 节点
 
 如果你只想部署仓库当前已经生成好的控制器，这是最快的方法，**不需要先用 Simulink 再生成一次 C++ 代码**。
@@ -401,9 +452,10 @@ MATLAB/Simulink release: R2023b
 
 # 7. 仓库更新后的快速重新部署
 
+如果需要从原仓库重新部署控制器，请先按照 [4.1 节](#41-已有本地仓库同步最新-homework-模型保留本地修改) 完成安全同步。仅下载 Homework 不需要执行本节。以下命令会替换工作空间中的软件包副本，若其中有本地修改，请先备份。
+
 ```bash
 cd ~/F450
-git pull
 
 rm -rf ~/f450_ws/src/custom_msgs ~/f450_ws/src/softdrone_pid
 cp -r src/simulink/src/custom_msgs ~/f450_ws/src/
